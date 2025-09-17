@@ -25,22 +25,28 @@ using namespace std;
 TrigramProfile buildTrigramProfile(const Text &text)
 {
     wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    TrigramProfile TrigramProfile;
 
-    // Your code goes here...
-    for (auto line : text)
+    wstring line = converter.from_bytes(text.front());
+
+    for (int i =0; i< line.length()-3; i++)
     {
-        if ((line.length() > 0) &&
-            (line[line.length() - 1] == '\r'))
-            line = line.substr(0, line.length() - 1);
+        if(line.length() < 3)
+            continue;   
+
+        string trigram = converter.to_bytes(line.substr(i,3));
+
+        if(TrigramProfile.find(trigram) != TrigramProfile.end())
+        {
+            TrigramProfile[trigram] +=1;
+        } else 
+        {
+            TrigramProfile[trigram] =1;
+        }
+        
     }
 
-    // Tip: converts UTF-8 string to wstring
-    // wstring unicodeString = converter.from_bytes(textLine);
-
-    // Tip: convert wstring to UTF-8 string
-    // string trigram = converter.to_bytes(unicodeTrigram);
-
-    return TrigramProfile(); // Fill-in result here
+    return TrigramProfile;
 }
 
 /**
@@ -50,7 +56,20 @@ TrigramProfile buildTrigramProfile(const Text &text)
  */
 void normalizeTrigramProfile(TrigramProfile &trigramProfile)
 {
-    // Your code goes here...
+    double sumFrequencies = 0;
+
+    for ( auto &triagramList : trigramProfile)
+    {
+        sumFrequencies += (double)triagramList.second * (double)triagramList.second;
+    }
+
+    sumFrequencies = sqrt(sumFrequencies);
+    for ( auto &triagramList : trigramProfile)
+    {
+        triagramList.second = (float)((double)triagramList.second / sumFrequencies);
+    }
+        
+
 
     return;
 }
@@ -64,9 +83,19 @@ void normalizeTrigramProfile(TrigramProfile &trigramProfile)
  */
 float getCosineSimilarity(TrigramProfile &textProfile, TrigramProfile &languageProfile)
 {
-    // Your code goes here...
+    float sumCoincidende = 0;
+    for(auto &textTriagram : textProfile)
+    {
+        if(languageProfile.find(textTriagram.first) != languageProfile.end())
+        {
+            sumCoincidende += textTriagram.second * languageProfile[textTriagram.first];
+        } else 
+        {
+            continue;
+        }
+    }
 
-    return 0; // Fill-in result here
+    return sumCoincidende; 
 }
 
 /**
@@ -78,7 +107,25 @@ float getCosineSimilarity(TrigramProfile &textProfile, TrigramProfile &languageP
  */
 string identifyLanguage(const Text &text, LanguageProfiles &languages)
 {
-    // Your code goes here...
+    TrigramProfile triagramProfile = buildTrigramProfile(text);
 
-    return ""; // Fill-in result here
+    normalizeTrigramProfile(triagramProfile);
+
+    float maxCosineSimilarity = 0;
+
+    string identifiedLanguageCode = "---";
+
+    for(auto &language : languages)
+    {
+        float cosineSimilarity = getCosineSimilarity(triagramProfile, language.trigramProfile);
+
+        if(cosineSimilarity > maxCosineSimilarity)
+        {
+            maxCosineSimilarity = cosineSimilarity;
+          
+            identifiedLanguageCode = language.languageCode;
+        }
+    }
+
+    return identifiedLanguageCode;
 }
