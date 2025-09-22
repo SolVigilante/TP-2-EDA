@@ -26,10 +26,12 @@ TrigramProfile buildTrigramProfile(const Text &text)
 {
     wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     TrigramProfile TrigramProfile;
+    unsigned int cantTrigramas = 0;
+
 
     wstring line = converter.from_bytes(text.front());
 
-    for (int i =0; i< line.length()-3; i++)
+    for (int i =0; i< line.length()-3 && cantTrigramas <= 2000; i++)
     {
         if(line.length() < 3)
             continue;   
@@ -43,8 +45,10 @@ TrigramProfile buildTrigramProfile(const Text &text)
         {
             TrigramProfile[trigram] =1;
         }
+        cantTrigramas++;
         
     }
+    TrigramProfile["CantTrigramas"] = (float)cantTrigramas; //Guarda la cantidad de trigramas para normalizar despues
 
     return TrigramProfile;
 }
@@ -57,10 +61,14 @@ TrigramProfile buildTrigramProfile(const Text &text)
 void normalizeTrigramProfile(TrigramProfile &trigramProfile)
 {
     double sumFrequencies = 0;
+    float cantTrigramas = (int)trigramProfile["CantTrigramas"];
 
     for ( auto &triagramList : trigramProfile)
     {
-        sumFrequencies += (double)triagramList.second * (double)triagramList.second;
+        if(triagramList.second < cantTrigramas* 0.001 && triagramList.second > cantTrigramas*0.98 ) //Elimina los trigramas demasiado comunes que pertenecen a cualquier lenguaje y los menos comunes que no son represenativos
+            trigramProfile.erase(triagramList.first);
+        else
+            sumFrequencies += (double)triagramList.second * (double)triagramList.second;
     }
 
     sumFrequencies = sqrt(sumFrequencies);
