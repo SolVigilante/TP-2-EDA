@@ -77,7 +77,7 @@ void normalizeTrigramProfile(TrigramProfile &trigramProfile)
 
     for ( auto &triagramList : trigramProfile)
     {
-            sumFrequencies += (double)triagramList.second * (double)triagramList.second;
+        sumFrequencies += (double)triagramList.second * (double)triagramList.second;
         
     }
 
