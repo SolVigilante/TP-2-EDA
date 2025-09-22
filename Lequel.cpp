@@ -25,30 +25,43 @@ using namespace std;
 TrigramProfile buildTrigramProfile(const Text &text)
 {
     wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
     TrigramProfile TrigramProfile;
-    unsigned int cantTrigramas = 0;
+    string trigram;
+    wstring unicodeString, unicodeTrigram;
 
+    int cantTrigrams = 0;
 
-    wstring line = converter.from_bytes(text.front());
-
-    for (int i =0; i< line.length()-3 && cantTrigramas <= 2000; i++)
+ for (auto line : text)
     {
-        if(line.length() < 3)
-            continue;   
-
-        string trigram = converter.to_bytes(line.substr(i,3));
-
-        if(TrigramProfile.find(trigram) != TrigramProfile.end())
-        {
-            TrigramProfile[trigram] +=1;
-        } else 
-        {
-            TrigramProfile[trigram] =1;
-        }
-        cantTrigramas++;
+        if ((line.length() > 0) && (line[line.length() - 1] == '\r'))
+                line = line.substr(0, line.length() - 1);
         
+        unicodeString = converter.from_bytes(line);
+
+        if (unicodeString.length() < 3)
+                continue;
+
+        for(int i=0; i < unicodeString.length() - 2; i++)
+        {
+            unicodeTrigram=unicodeString.substr(i,3); // Extracts a trigram
+            trigram = converter.to_bytes(unicodeTrigram);// Converts it back to UTF-8 string
+
+            if(TrigramProfile.find(trigram) != TrigramProfile.end())
+            {
+                TrigramProfile[trigram] += 1;
+            } else 
+            {
+                TrigramProfile[trigram] = 1;
+            }
+
+            cantTrigrams++;
+        }
+        
+        if(cantTrigrams >= 500){
+            break; // Limits to first 500 trigrams
+        }
     }
-    TrigramProfile["CantTrigramas"] = (float)cantTrigramas; //Guarda la cantidad de trigramas para normalizar despues
 
     return TrigramProfile;
 }
@@ -61,24 +74,22 @@ TrigramProfile buildTrigramProfile(const Text &text)
 void normalizeTrigramProfile(TrigramProfile &trigramProfile)
 {
     double sumFrequencies = 0;
-    float cantTrigramas = (int)trigramProfile["CantTrigramas"];
+
+    size_t cantTrigrams = trigramProfile.size();
 
     for ( auto &triagramList : trigramProfile)
     {
-        if(triagramList.second < cantTrigramas* 0.001 && triagramList.second > cantTrigramas*0.98 ) //Elimina los trigramas demasiado comunes que pertenecen a cualquier lenguaje y los menos comunes que no son represenativos
-            trigramProfile.erase(triagramList.first);
-        else
+        if(triagramList.second >= cantTrigrams * 0.01 && triagramList.second <= cantTrigrams * 0.9) // Keeps only trigrams with frequency between 1% and 90%
             sumFrequencies += (double)triagramList.second * (double)triagramList.second;
     }
 
     sumFrequencies = sqrt(sumFrequencies);
+
     for ( auto &triagramList : trigramProfile)
     {
         triagramList.second = (float)((double)triagramList.second / sumFrequencies);
     }
         
-
-
     return;
 }
 
