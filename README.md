@@ -2,9 +2,8 @@
 
 ## Integrantes del grupo y contribución al trabajo de cada integrante
 
-* [Nombre]: [contribución]
-
-[completar]
+* Vigilante María Sol : puntaje obligatorio y colaboración en la eficiencia
+* Cristobal Francisco Cramer Rodrigo : Puntaje adicional
 
 ## Respuestas del enunciado
 
@@ -97,6 +96,6 @@ El texto dice que está en Afrikaans cuando realmente está en inglés. El poble
 La similiud coseno a nivel matemático corresponde a la medida de la similitud entre dos vectores en un espacio. Esta función evalúa la medida del coseno del ángulo entre ambos vectores. Si la función retorna 1 significa que el ángulo comprendido es cero. Particulamente para la aplicación que le estamos dando en este proyecto, se puede traducir a la medida de la similitud de un vector que almacena tidas las frecuencias de los trigramas del texto introducido con el vector que almacena las frecuncias de trigramas de un lenguaje. 
 
 ## Cuello de botella
-El cuello de botella es la cantidad de lineas de texto que debe procesar el código. Se podría resolver bajando la cantidad de trigramas, según estudios solo hacen falta 300 rigramas representativos para reconocer un lenguaje. También sirve filtrar los trigramas 10% más comunes porque esos suelen ser los articulos que comparten varios idiomas. Lo mismo se podrían filtrar los menos frecuentes que resultan ser los menos representativos.   
+El cuello de botella es la cantidad de lineas de texto que debe procesar el código. Se podría resolver bajando la cantidad de trigramas, según estudios solo hacen falta 300 trigramas representativos para reconocer un lenguaje. También sirve filtrar los trigramas 10% más comunes porque esos suelen ser los articulos que comparten varios idiomas. Lo mismo se podrían filtrar los menos frecuentes que resultan ser los menos representativos.   
 
 
