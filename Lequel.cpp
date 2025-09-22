@@ -58,8 +58,8 @@ TrigramProfile buildTrigramProfile(const Text &text)
             cantTrigrams++;
         }
         
-        if(cantTrigrams >= 500){
-            break; // Limits to first 500 trigrams
+        if(cantTrigrams >= 600){
+            break; // Limits to first 600 trigrams
         }
     }
 
@@ -75,12 +75,10 @@ void normalizeTrigramProfile(TrigramProfile &trigramProfile)
 {
     double sumFrequencies = 0;
 
-    size_t cantTrigrams = trigramProfile.size();
-
     for ( auto &triagramList : trigramProfile)
     {
-        if(triagramList.second >= cantTrigrams * 0.01 && triagramList.second <= cantTrigrams * 0.9) // Keeps only trigrams with frequency between 1% and 90%
             sumFrequencies += (double)triagramList.second * (double)triagramList.second;
+        
     }
 
     sumFrequencies = sqrt(sumFrequencies);
@@ -107,7 +105,10 @@ float getCosineSimilarity(TrigramProfile &textProfile, TrigramProfile &languageP
     {
         if(languageProfile.find(textTriagram.first) != languageProfile.end())
         {
-            sumCoincidende += textTriagram.second * languageProfile[textTriagram.first];
+             if(textTriagram.second >= 0.01 && textTriagram.second <=  0.9) // Keeps only trigrams with frequency between 1% and 90%
+                sumCoincidende += textTriagram.second * languageProfile[textTriagram.first];
+            else
+                continue;
         } else 
         {
             continue;
